@@ -21,9 +21,14 @@ std::string RemoveSmiles(const std::string& orig) {
         state = States::gotColonDash;
       }
       else {
-        state = States::default;
-        retStr.push_back(':');
-        retStr.push_back(ch);
+        if (ch != ':') {
+          retStr.push_back(':');
+          retStr.push_back(ch);
+          state = States::default;
+        }
+        else {
+          retStr.push_back(':');
+        }
       }
       break;
 
@@ -35,24 +40,40 @@ std::string RemoveSmiles(const std::string& orig) {
         state = States::gotColonDashRight;
       }
       else {
-        state = States::default;
         retStr.push_back(':');
         retStr.push_back('-');
-        retStr.push_back(ch);
+
+        if (ch != ':') {
+          retStr.push_back(ch);
+          state = States::default;
+        }
+        else {
+          state = States::gotColon;
+        }
       }
       break;
 
     case States::gotColonDashLeft:
       if (ch != '(') {
-        state = States::default;
-        retStr.push_back(ch);
+        if (ch != ':') {
+          state = States::default;
+          retStr.push_back(ch);
+        }
+        else {
+          state = States::gotColon;
+        }
       }
       break;
 
     case States::gotColonDashRight:
       if (ch != ')') {
-        state = States::default;
-        retStr.push_back(ch);
+        if (ch != ':') {
+          state = States::default;
+          retStr.push_back(ch);
+        }
+        else {
+          state = States::gotColon;
+        }
       }
       break;
 
@@ -60,6 +81,14 @@ std::string RemoveSmiles(const std::string& orig) {
       throw std::runtime_error("Error! Wrong state!\n");
     } // switch
   } // for
+
+  if (state == States::gotColon) {
+    retStr.push_back(':');
+  }
+  else if (state == States::gotColonDash) {
+    retStr.push_back(':');
+    retStr.push_back('-');
+  }
 
   retStr.shrink_to_fit();
   return retStr;
