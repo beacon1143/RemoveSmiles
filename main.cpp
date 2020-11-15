@@ -1,9 +1,14 @@
 #include <iostream>
 #include "RemoveSmiles.hpp"
+#include "AutoTest.hpp"
 
 
 int main() {
   try {
+    if (!AutoTest(true)) {
+      std::cout << "Some tests not passed!\n";
+      return 0;
+    }
     std::string old_str, new_str;
 
     std::cout << "Input string:\n";
